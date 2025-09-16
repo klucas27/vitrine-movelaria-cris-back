@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model AdminUser {
+  adm_id       Int    @id @default(autoincrement())
+  adm_login    String @db.VarChar(50)
+  adm_password String @db.Char(64)
+}
+
+model Categoria {
+  cat_id     Int     @id @default(autoincrement())
+  cat_comodo String  @db.VarChar(50)
+  cat_image  String? @db.LongText
+  moveis     Movel[] @relation("CategoriaMoveis")
+}
+
+model Cor {
+  cor_id   Int     @id @default(autoincrement())
+  cor_nome String? @db.VarChar(45)
+  cor_tom  String? @db.VarChar(45)
+  moveis   Movel[] @relation("CorMoveis")
+}
+
+model Imagem {
+  img_id   Int     @id @default(autoincrement())
+  img_nome String? @db.VarChar(45)
+  img_url  String? @db.LongText
+  moveis   Movel[] @relation("ImagemMoveis")
+}
+
+model Material {
+  mat_id       Int     @id @default(autoincrement())
+  mat_nome     String? @db.VarChar(45)
+  mat_descricao String? @db.Text
+  mat_textura  String? @db.VarChar(45)
+  moveis       Movel[] @relation("MaterialMoveis")
+}
+
+model Movel {
+  mov_Id          Int      @id @default(autoincrement())
+  mov_nome        String   @db.VarChar(100)
+  mov_preco       Decimal? @db.Decimal(10,2)
+  mov_descricao   String?  @db.Text
+  mov_ativo       Boolean? @db.TinyInt
+  tipo_tip_id     Int
+  material_mat_id Int
+  cor_cor_id      Int
+  imagem_img_id   Int
+
+  categoria       Categoria @relation("CategoriaMoveis", fields: [tipo_tip_id], references: [cat_id])
+  material        Material  @relation("MaterialMoveis", fields: [material_mat_id], references: [mat_id])
+  cor             Cor       @relation("CorMoveis", fields: [cor_cor_id], references: [cor_id])
+  imagem          Imagem    @relation("ImagemMoveis", fields: [imagem_img_id], references: [img_id])
+}
