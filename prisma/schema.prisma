@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,53 +8,68 @@ datasource db {
 }
 
 model AdminUser {
-  adm_id       Int    @id @default(autoincrement())
-  adm_login    String @db.VarChar(50)
-  adm_password String @db.Char(64)
+  id       Int    @id @default(autoincrement()) @map("adm_id")
+  login    String @map("adm_login") @db.VarChar(50)
+  password String @map("adm_password") @db.Char(64)
+
+  @@map("admin_user")
 }
 
 model Categoria {
-  cat_id     Int     @id @default(autoincrement())
-  cat_comodo String  @db.VarChar(50)
-  cat_image  String? @db.LongText
-  moveis     Movel[] @relation("CategoriaMoveis")
+  id     Int     @id @default(autoincrement()) @map("cat_id")
+  comodo String  @map("cat_comodo") @db.VarChar(50)
+  image  String? @map("cat_image") @db.LongText
+  moveis movel[]
+
+  @@map("categoria")
 }
 
 model Cor {
-  cor_id   Int     @id @default(autoincrement())
-  cor_nome String? @db.VarChar(45)
-  cor_tom  String? @db.VarChar(45)
-  moveis   Movel[] @relation("CorMoveis")
+  id     Int     @id @default(autoincrement()) @map("cor_id")
+  nome   String? @map("cor_nome") @db.VarChar(45)
+  tom    String? @map("cor_tom") @db.VarChar(45)
+  moveis movel[]
+
+  @@map("cor")
 }
 
 model Imagem {
-  img_id   Int     @id @default(autoincrement())
-  img_nome String? @db.VarChar(45)
-  img_url  String? @db.LongText
-  moveis   Movel[] @relation("ImagemMoveis")
+  id     Int     @id @default(autoincrement()) @map("img_id")
+  nome   String? @map("img_nome") @db.VarChar(45)
+  url    String? @map("img_url") @db.LongText
+  moveis movel[]
+
+  @@map("imagem")
 }
 
 model Material {
-  mat_id       Int     @id @default(autoincrement())
-  mat_nome     String? @db.VarChar(45)
-  mat_descricao String? @db.Text
-  mat_textura  String? @db.VarChar(45)
-  moveis       Movel[] @relation("MaterialMoveis")
+  id        Int     @id @default(autoincrement()) @map("mat_id")
+  nome      String? @map("mat_nome") @db.VarChar(45)
+  descricao String? @map("mat_descricao") @db.Text
+  textura   String? @map("mat_textura") @db.VarChar(45)
+  moveis    movel[]
+
+  @@map("material")
 }
 
-model Movel {
-  mov_Id          Int      @id @default(autoincrement())
-  mov_nome        String   @db.VarChar(100)
-  mov_preco       Decimal? @db.Decimal(10,2)
-  mov_descricao   String?  @db.Text
-  mov_ativo       Boolean? @db.TinyInt
-  tipo_tip_id     Int
-  material_mat_id Int
-  cor_cor_id      Int
-  imagem_img_id   Int
+model movel {
+  id          Int       @id @default(autoincrement()) @map("mov_Id")
+  nome        String    @map("mov_nome") @db.VarChar(100)
+  preco       Decimal?  @map("mov_preco") @db.Decimal(10, 2)
+  descricao   String?   @map("mov_descricao") @db.Text
+  mov_ativo   Int?      @default(1) @db.TinyInt
+  categoriaId Int       @map("tipo_tip_id")
+  materialId  Int       @map("material_mat_id")
+  corId       Int       @map("cor_cor_id")
+  imagemId    Int       @map("imagem_img_id")
+  cor         Cor       @relation(fields: [corId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_moveis_cor1")
+  imagem      Imagem    @relation(fields: [imagemId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_moveis_imagem1")
+  material    Material  @relation(fields: [materialId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_moveis_material1")
+  categoria   Categoria @relation(fields: [categoriaId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_moveis_tipo")
 
-  categoria       Categoria @relation("CategoriaMoveis", fields: [tipo_tip_id], references: [cat_id])
-  material        Material  @relation("MaterialMoveis", fields: [material_mat_id], references: [mat_id])
-  cor             Cor       @relation("CorMoveis", fields: [cor_cor_id], references: [cor_id])
-  imagem          Imagem    @relation("ImagemMoveis", fields: [imagem_img_id], references: [img_id])
+  @@index([categoriaId], map: "fk_moveis_tipo_idx")
+  @@index([materialId], map: "fk_moveis_material1_idx")
+  @@index([corId], map: "fk_moveis_cor1_idx")
+  @@index([imagemId], map: "fk_moveis_imagem1_idx")
+  @@map("movel")
 }

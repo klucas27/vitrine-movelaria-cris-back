@@ -1,51 +1,61 @@
+import { Request, Response } from 'express';
+import { PrismaClient } from '@prisma/client';
 
-import { Request, Response } from "express";
-import prisma from "../prisma";
+const prisma = new PrismaClient();
 
+export const getActiveProducts = async (req: Request, res: Response) => {
+  try {
+    const moveis = await prisma.movel.findMany({
+      where: { mov_ativo: 1 },
+      include: {
+        categoria: true,
+        material: true,
+        cor: true,
+        imagem: true
+      }
+    });
+    const result = moveis.map((m) => ({
+      id: m.id,
+      nome: m.nome,
+      preco: m.preco,
+      descricao: m.descricao,
+      ativo: m.mov_ativo,
+      categoria: m.categoria?.comodo || null,
+      material: m.material?.nome || null,
+      cor: m.cor ? `${m.cor.nome} (${m.cor.tom})` : null,
+      imagem_url: m.imagem?.url || null
+    }));
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erro ao buscar moveis ativos" });
+  }
+};
 
 export const getAllProducts = async (req: Request, res: Response) => {
   try {
     const moveis = await prisma.movel.findMany({
-      where: { mov_ativo: true },
       include: {
-        imagem: {
-          select: { img_url: true }
-        }
+        categoria: true,
+        material: true,
+        cor: true,
+        imagem: true
       }
     });
-    const result = moveis.map((m: any) => ({
-      ...m,
-      imagem_url: m.imagem?.img_url || null
+    const result = moveis.map((m) => ({
+      id: m.id,
+      nome: m.nome,
+      preco: m.preco,
+      descricao: m.descricao,
+      ativo: m.mov_ativo,
+      categoria: m.categoria?.comodo || null,
+      material: m.material?.nome || null,
+      cor: m.cor ? `${m.cor.nome} (${m.cor.tom})` : null,
+      imagem_url: m.imagem?.url || null
     }));
     res.json(result);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Erro ao buscar moveis" });
-  }
-};
-
-
-export const createMovel = async (req: Request, res: Response) => {
-  try {
-    const { nome, preco, descricao, ativo, tipo, material, cor, imagem } = req.body;
-    if (!nome || !descricao || !preco || ativo === undefined) {
-      return res.status(400).json({ error: "Campos obrigatórios: nome, descricao, preco, tipo" });
-    }
-    const novoMovel = await prisma.movel.create({
-      data: {
-        mov_nome: nome,
-        mov_preco: preco,
-        mov_descricao: descricao,
-        mov_ativo: ativo,
-        tipo_tip_id: tipo,
-        material_mat_id: material,
-        cor_cor_id: cor,
-        imagem_img_id: imagem
-      }
-    });
-    res.status(201).json({ id: novoMovel.mov_Id, nome, descricao, preco });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Erro ao cadastrar movel" });
   }
 };
