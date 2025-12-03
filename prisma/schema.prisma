@@ -2,74 +2,20 @@ generator client {
   provider = "prisma-client-js"
 }
 
-datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
-}
+  datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+  }
 
-model AdminUser {
-  id       Int    @id @default(autoincrement()) @map("adm_id")
-  login    String @map("adm_login") @db.VarChar(50)
-  password String @map("adm_password") @db.Char(64)
 
-  @@map("admin_user")
-}
+  model vititens {
+    vitId        Int     @id @default(autoincrement()) @map("vitId")
+    vitNome      String  @map("vitNome") @db.VarChar(100)
+    vitDescricao String? @map("vitDescricao") @db.Text
+    vitCategoria String? @map("vitCategoria") @db.VarChar(50)
+    vitMaterial  String? @map("vitMaterial") @db.VarChar(45)
+    vitPreco     Decimal? @map("vitPreco") @db.Decimal(10, 2)
+    vitImagem    String? @map("vitImagem") @db.LongText
 
-model Categoria {
-  id     Int     @id @default(autoincrement()) @map("cat_id")
-  comodo String  @map("cat_comodo") @db.VarChar(50)
-  image  String? @map("cat_image") @db.LongText
-  moveis movel[]
-
-  @@map("categoria")
-}
-
-model Cor {
-  id     Int     @id @default(autoincrement()) @map("cor_id")
-  nome   String? @map("cor_nome") @db.VarChar(45)
-  tom    String? @map("cor_tom") @db.VarChar(45)
-  moveis movel[]
-
-  @@map("cor")
-}
-
-model Imagem {
-  id     Int     @id @default(autoincrement()) @map("img_id")
-  nome   String? @map("img_nome") @db.VarChar(45)
-  url    String? @map("img_url") @db.LongText
-  moveis movel[]
-
-  @@map("imagem")
-}
-
-model Material {
-  id        Int     @id @default(autoincrement()) @map("mat_id")
-  nome      String? @map("mat_nome") @db.VarChar(45)
-  descricao String? @map("mat_descricao") @db.Text
-  textura   String? @map("mat_textura") @db.VarChar(45)
-  moveis    movel[]
-
-  @@map("material")
-}
-
-model movel {
-  id          Int       @id @default(autoincrement()) @map("mov_Id")
-  nome        String    @map("mov_nome") @db.VarChar(100)
-  preco       Decimal?  @map("mov_preco") @db.Decimal(10, 2)
-  descricao   String?   @map("mov_descricao") @db.Text
-  mov_ativo   Int?      @default(1) @db.TinyInt
-  categoriaId Int       @map("tipo_tip_id")
-  materialId  Int       @map("material_mat_id")
-  corId       Int       @map("cor_cor_id")
-  imagemId    Int       @map("imagem_img_id")
-  cor         Cor       @relation(fields: [corId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_moveis_cor1")
-  imagem      Imagem    @relation(fields: [imagemId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_moveis_imagem1")
-  material    Material  @relation(fields: [materialId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_moveis_material1")
-  categoria   Categoria @relation(fields: [categoriaId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_moveis_tipo")
-
-  @@index([categoriaId], map: "fk_moveis_tipo_idx")
-  @@index([materialId], map: "fk_moveis_material1_idx")
-  @@index([corId], map: "fk_moveis_cor1_idx")
-  @@index([imagemId], map: "fk_moveis_imagem1_idx")
-  @@map("movel")
-}
+    @@map("vititens")
+  }
