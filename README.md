@@ -8,21 +8,34 @@ Este projeto é o backend da aplicação Vitrine Movelaria Cris, desenvolvido em
 - **Express**
 - **Prisma ORM**
 - **MySQL**
-- **dotenv** (variáveis de ambiente)
-- **CORS**
 
-## Estrutura de Pastas
+## Tecnologias
+- Node.js
+- TypeScript
+- Express
+- Prisma ORM
+- MySQL
+- dotenv
+- CORS
+
+## Estrutura do Projeto
 ```
-src/
-  app.ts                # Arquivo principal, inicializa o servidor Express
-  prisma.ts             # Instância do Prisma Client
-  controllers/
-    productsController.ts # Lógica das rotas de móveis
-  routes/
-    productsRoutes.ts     # Rotas relacionadas a móveis
+├── prisma/
+│   └── schema.prisma         # Schema do banco de dados
+├── src/
+│   ├── app.ts                # Inicialização do servidor Express
+│   ├── prisma.ts             # Instância do Prisma Client
+│   ├── controllers/
+│   │   └── productsController.ts # Controller de móveis
+│   └── routes/
+│       └── productsRoutes.ts     # Rotas de móveis
+├── package.json
+├── tsconfig.json
+├── .env
+└── README.md
 ```
 
-## Configuração
+## Configuração Inicial
 1. **Clone o repositório:**
    ```bash
    git clone https://github.com/klucas27/vitrine-movelaria-cris-back.git
@@ -33,45 +46,43 @@ src/
    npm install
    ```
 3. **Configure o arquivo `.env`:**
-   Crie um arquivo `.env` na raiz do projeto com as variáveis:
+   Crie um arquivo `.env` na raiz do projeto:
    ```env
-   PORT=3000
-   DATABASE_URL="mysql://usuario:senha@host:porta/nome_do_banco"
-   DB_HOST=...
-   DB_USER=...
-   DB_PASS=...
-   DB_NAME=...
+   PORT=3001
+   DATABASE_URL="mysql://root:123456@localhost:3308/movelaria"
    ALLOWED_ORIGIN=http://localhost:3001
    ```
-4. **Configure o banco de dados:**
-   - O projeto utiliza o Prisma ORM. O schema do banco está em `prisma/schema.prisma`.
-   - Para sincronizar o Prisma com o banco existente:
+4. **Banco de dados:**
+   - O schema está em `prisma/schema.prisma`.
+   - Para sincronizar com o banco existente:
      ```bash
      npx prisma db pull
      npx prisma generate
      ```
-   - Para criar as tabelas do zero (atenção: apaga dados!):
+   - Para criar as tabelas do zero (apaga dados!):
      ```bash
      npx prisma migrate dev --name init
      ```
 
 ## Executando o Projeto
-- **Modo desenvolvimento:**
+- **Desenvolvimento:**
   ```bash
   npm run dev
   ```
-- **Modo produção:**
+- **Produção:**
   ```bash
   npm run build
   npm start
   ```
 
-## Endpoints Principais
-O prefixo das rotas é `/furniture`.
+## Endpoints da API
+Prefixo das rotas: `/furniture`
 
-- `GET /furniture/all` - Retorna todos os móveis cadastrados
-- `GET /furniture/ativos` - Retorna apenas os móveis ativos
-- `POST /furniture/createmovel` - Cadastra um novo móvel (implementar no controller)
+| Método | Rota                   | Descrição                        |
+|--------|------------------------|----------------------------------|
+| GET    | /furniture/all         | Retorna todos os móveis          |
+| GET    | /furniture/ativos      | Retorna móveis ativos            |
+| POST   | /furniture/createmovel | Cadastra novo móvel (implementar)|
 
 ### Exemplo de resposta
 ```json
@@ -81,34 +92,49 @@ O prefixo das rotas é `/furniture`.
     "nome": "Mesa de Jantar",
     "preco": 1200.00,
     "descricao": "Mesa de madeira maciça",
-    "ativo": 1,
     "categoria": "Sala de Jantar",
     "material": "Madeira",
-    "cor": "Branco (Fosco)",
     "imagem_url": "https://..."
   }
 ]
 ```
 
 ## Modelos do Banco
-O banco possui as tabelas:
+Principais tabelas:
 - `admin_user` (administração)
 - `categoria` (categorias de móveis)
 - `cor` (cores)
 - `imagem` (imagens)
 - `material` (materiais)
-- `movel` (móveis, com relacionamentos para as demais)
+- `movel` (móveis)
+
+Exemplo de modelo Prisma:
+```prisma
+model movel {
+  id        Int     @id @default(autoincrement())
+  nome      String  @db.VarChar(100)
+  descricao String? @db.Text
+  categoria String? @db.VarChar(50)
+  material  String? @db.VarChar(45)
+  preco     Decimal? @db.Decimal(10, 2)
+  imagem_url String? @db.LongText
+
+  @@map("movel")
+}
+```
 
 O schema completo está em `prisma/schema.prisma`.
 
 ## Boas Práticas
-- Separe lógica de negócio (controllers) das rotas.
-- Use variáveis de ambiente para dados sensíveis.
-- Sempre rode `npx prisma generate` após alterar o schema.
-- Documente novos endpoints e modelos.
+- Separe lógica de negócio (controllers) das rotas
+- Use variáveis de ambiente para dados sensíveis
+- Rode `npx prisma generate` após alterar o schema
+- Documente endpoints e modelos
+- Use TypeScript com tipagem estrita
+- Versione o projeto com Git
 
 ## Contribuição
-Pull requests são bem-vindos! Para contribuir:
+Pull requests são bem-vindos!
 1. Fork o projeto
 2. Crie uma branch (`git checkout -b feature/nome-feature`)
 3. Commit suas alterações
@@ -118,4 +144,5 @@ Pull requests são bem-vindos! Para contribuir:
 Abra uma issue no repositório ou entre em contato com o autor.
 
 ---
-Projeto desenvolvido por Codexux.
+Projeto desenvolvido por Kresley Lucas.
+Projeto desenvolvido por Codexus (Grupo PI Fatec Guaratinguetá).
