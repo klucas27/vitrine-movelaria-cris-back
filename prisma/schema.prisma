@@ -19,3 +19,12 @@ generator client {
 
     @@map("vititens")
   }
+
+  model usuario {
+    id       Int    @id @default(autoincrement())
+    nome     String @db.VarChar(100)
+    username String @unique @db.VarChar(50)
+    senha    String @db.VarChar(255)
+
+    @@map("usuario")
+  }
